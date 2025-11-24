@@ -1,75 +1,86 @@
 #include <stdio.h>
 #include <string.h>
+
 #define MAX 100
+
 struct Task {
-    char title[50];
-    char desc[100];
-    char deadline[20];
-    int priority;
-    int completed;
+    char name[100];
+    int completed; // 0 = pending, 1 = completed
 };
-struct Task tasks[MAX];
-int taskCount = 0;
-void addTask() {
-    printf("\n--- Add New Task ---\n");
-    printf("Enter Title: ");
-    scanf(" %[^\n]", tasks[taskCount].title);
-    printf("Enter Description: ");
-    scanf(" %[^\n]", tasks[taskCount].desc);
-    printf("Enter Deadline (dd/mm/yyyy): ");
-    scanf(" %[^\n]", tasks[taskCount].deadline);
-    printf("Enter Priority (1-5): ");
-    scanf("%d", &tasks[taskCount].priority);
-    tasks[taskCount].completed = 0;
-    taskCount++;
-    printf("Task added successfully!\n");
+
+int main() {
+    struct Task tasks[MAX];
+    int count = 0;
+    int choice;
+
+    while (1) {
+        printf("\n===== SIMPLE TO-DO LIST =====\n");
+        printf("1. Add Task\n");
+        printf("2. View Tasks\n");
+        printf("3. Mark Task as Completed\n");
+        printf("4. Delete Task\n");
+        printf("5. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+        getchar(); // to clear newline
+
+        if (choice == 1) {
+            if (count >= MAX) {
+                printf("Task list full!\n");
+                continue;
+            }
+            printf("Enter task name: ");
+            fgets(tasks[count].name, 100, stdin);
+            tasks[count].name[strcspn(tasks[count].name, "\n")] = 0;
+            tasks[count].completed = 0;
+            count++;
+            printf("Task added!\n");
+
+        } else if (choice == 2) {
+            if (count == 0) {
+                printf("No tasks added.\n");
+            } else {
+                printf("\nYour Tasks:\n");
+                for (int i = 0; i < count; i++) {
+                    printf("%d. %s [%s]\n", i + 1, tasks[i].name,
+                           tasks[i].completed ? "Completed" : "Pending");
+                }
+            }
+
+        } else if (choice == 3) {
+            int n;
+            printf("Enter task number to mark complete: ");
+            scanf("%d", &n);
+            if (n < 1 || n > count) {
+                printf("Invalid task number!\n");
+            } else {
+                tasks[n - 1].completed = 1;
+                printf("Task marked as completed!\n");
+            }
+
+        } else if (choice == 4) {
+            int n;
+            printf("Enter task number to delete: ");
+            scanf("%d", &n);
+            if (n < 1 || n > count) {
+                printf("Invalid task number!\n");
+            } else {
+                for (int i = n - 1; i < count - 1; i++) {
+                    tasks[i] = tasks[i + 1];
+                }
+                count--;
+                printf("Task deleted!\n");
+            }
+
+        } else if (choice == 5) {
+            printf("Exiting...\n");
+            break;
+
+        } else {
+            printf("Invalid choice!\n");
+        }
+    }
+
+    return 0;
 }
-void viewTasks() {
-    printf("\n--- Task List ---\n");
-    if (taskCount == 0) {
-        printf("No tasks available.\n");
-        return;
-    }
-    for (int i = 0; i < taskCount; i++) {
-        printf("\nTask %d:\n", i + 1);
-        printf("Title: %s\n", tasks[i].title);
-        printf("Description: %s\n", tasks[i].desc);
-        printf("Deadline: %s\n", tasks[i].deadline);
-        printf("Priority: %d\n", tasks[i].priority);
-        printf("Status: %s\n", tasks[i].completed ? "Completed" : "Pending");
-    }
-}
 
-// Mark a task as completed
-void markTaskCompleted() {
-    int n;
-    printf("\nEnter task number to mark complete: ");
-    scanf("%d", &n);
-
-    if (n < 1 || n > taskCount) {
-        printf("Invalid task number!\n");
-        return;
-    }
-
-    tasks[n - 1].completed = 1;
-    printf("Task marked as completed!\n");
-}
-
-// Delete a task
-void deleteTask() {
-    int n;
-    printf("\nEnter task number to delete: ");
-    scanf("%d", &n);
-
-    if (n < 1 || n > taskCount) {
-        printf("Invalid task number!\n");
-        return;
-    }
-
-    for (int i = n - 1; i < taskCount - 1; i++) {
-        tasks[i] = tasks[i + 1];
-    }
-    taskCount--;
-
-    printf("Task deleted successfully!\n");
-}
